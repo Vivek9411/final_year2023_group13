@@ -420,34 +420,6 @@
 
 {% block scripts %}
     {{ super() }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-    // Check if we're coming from a form submission
-    const isPageRefresh = performance.navigation.type === performance.navigation.TYPE_RELOAD;
-
-    document.querySelectorAll('.btn-dash').forEach(button => {
-        // If we submitted the form, keep button disabled until manual refresh
-        if (sessionStorage.getItem('formSubmitted')) {
-            button.disabled = true;
-            button.textContent = 'Processing...';
-            sessionStorage.removeItem('formSubmitted');
-        }
-
-        button.addEventListener('click', function() {
-            // Set flag in sessionStorage
-            sessionStorage.setItem('formSubmitted', 'true');
-
-            // Visual feedback
-            this.disabled = true;
-            this.textContent = 'Processing...';
-
-            // Submit the form
-            if (this.form) {
-                this.form.submit();
-            }
-        });
-    });
-});
 
     </script>
 

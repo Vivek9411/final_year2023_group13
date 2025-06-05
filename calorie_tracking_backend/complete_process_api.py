@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from sqlalchemy import create_engine, MetaData, Table
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
-from symspellpy import SymSpell, Verbosity
 import json
 
 # Dictionary to map quantity words to numbers
@@ -84,21 +83,6 @@ def extract_entities(input_text):
             result.append({'Entity': ent['Entity'], 'Quantity': last_quantity})
             last_quantity = None  # Reset after assigning to a product
     return result
-
-
-
-
-
-# # Load SymSpell for spell correction
-# sym_spell = SymSpell(max_dictionary_edit_distance=2, prefix_length=7)
-# sym_spell.load_pickle('new_dictionary.pickle')
-
-
-
-# # Function to correct spelling mistakes
-# def correct_spelling(input_text):
-#     corrected_text = sym_spell.lookup_compound(input_text, max_edit_distance=2)[0].term
-#     return corrected_text
 
 
 
