@@ -1,0 +1,545 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - HealthTracker{% endblock %}
+
+{% block extra_head %}
+    <style>
+        .stat-card {
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card {
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Voice Input Styles */
+        .voice-input-btn {
+            transition: all 0.3s ease;
+            width: 40px;
+        }
+
+        .voice-input-btn.listening {
+            background-color: #dc3545 !important;
+            animation: pulse 1.5s infinite;
+        }
+
+        .voice-status {
+            font-size: 0.85rem;
+            min-height: 20px;
+            margin-top: 5px;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .button-rounded {
+            border-radius: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-4"><i class="fas fa-chart-line me-2"></i>Dashboard</h1>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white py-3 rounded-top-3">
+                    <h2 class="h5 mb-0"><i class="fas fa-pen me-2"></i>Log Your Activity</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <!-- Food Form Column -->
+                        <div class="col-md-6 px-2">
+                            <div class="h-100  px-4">
+                                <h3 class="h5 mb-3">What did you eat today?</h3>
+                                <form method="POST" action="{{ url_for('process_food_query') }}">
+                                    {{ form.hidden_tag() }}
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            {{ form.query(
+                                                class="form-control form-control-lg me-2",
+                                                placeholder="e.g., 'I ate two apples and a sandwich'",
+                                                id="foodInput"
+                                            ) }}
+                                            <button
+                                                    class="btn btn-outline-secondary voice-input-btn  button-rounded"
+                                                    type="button"
+                                                    id="foodVoiceBtn"
+                                                    title="Start voice input"
+                                            >
+                                                <i class="fas fa-microphone"></i>
+                                            </button>
+                                        </div>
+                                        <div id="foodVoiceStatus" class="voice-status text-muted"></div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg px-2 btn-dash">
+                                            <i class="fas fa-utensils me-2"></i> Log Food
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Exercise Form Column -->
+                        <div class="col-md-6 px-2">
+                            <div class="h-100 px-4">
+                                <h3 class="h5 mb-3">What exercise did you do?</h3>
+                                <form method="POST" action="{{ url_for('process_exercise_query') }}">
+                                    {{ exercise_form.hidden_tag() }}
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            {{ exercise_form.query(
+                                                class="form-control form-control-lg me-2",
+                                                placeholder="e.g., 'I ran for 30 minutes'",
+                                                id="exerciseInput"
+                                            ) }}
+                                            <button
+                                                    class="btn btn-outline-secondary voice-input-btn button-rounded"
+                                                    type="button"
+                                                    id="exerciseVoiceBtn"
+                                                    title="Start voice input"
+                                            >
+                                                <i class="fas fa-microphone"></i>
+                                            </button>
+                                        </div>
+                                        <div id="exerciseVoiceStatus" class="voice-status text-muted"></div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success btn-lg px-2 btn-dash">
+                                            <i class="fas fa-running me-2"></i> Log Exercise
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">Today's Summary</h2>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-fire card-icon text-primary"></i>
+                    <h3 class="card-title h5">Calories In</h3>
+                    <p class="display-6 fw-bold mb-0">{{ today_calories }}</p>
+                    <p class="text-muted mb-2">of {{ target_calories }} target calories</p>
+
+                    {% if calories_percent > 100 %}
+                        <div class="progress mb-1" style="height: 8px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 100%;"
+                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="text-danger mb-0 small">
+                            <i class="fas fa-exclamation-circle"></i> {{ calories_percent }}% of daily target
+                        </p>
+                    {% else %}
+                        <div class="progress mb-1" style="height: 8px;">
+                            <div class="progress-bar bg-{{ 'success' if calories_percent <= 90 else 'warning' }}"
+                                 role="progressbar" style="width: {{ calories_percent }}%;"
+                                 aria-valuenow="{{ calories_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="text-{{ 'success' if calories_percent <= 90 else 'warning' }} mb-0 small">{{ calories_percent }}%
+                            of daily target</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-running card-icon text-primary"></i>
+                    <h3 class="card-title h5">Calories Burned</h3>
+                    <p class="display-6 fw-bold mb-0">{{ today_calories_burned }}</p>
+                    <p class="text-muted">calories</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-balance-scale card-icon text-primary"></i>
+                    <h3 class="card-title h5">Net Calories</h3>
+                    <p class="display-6 fw-bold mb-0 {% if net_calories > 0 %}text-success{% else %}text-danger{% endif %}">{{ net_calories }}</p>
+                    <p class="text-muted">calories</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-drumstick-bite card-icon text-primary"></i>
+                    <h3 class="card-title h5">Protein</h3>
+                    <p class="display-6 fw-bold mb-0">{{ today_protein }}</p>
+                    <p class="text-muted mb-2">of {{ target_protein }}g target</p>
+
+                    {% if protein_percent > 150 %}
+                        <div class="progress mb-1" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 100%;"
+                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="text-warning mb-0 small">
+                            <i class="fas fa-exclamation-triangle"></i> {{ protein_percent }}% of daily target
+                        </p>
+                    {% elif protein_percent < 50 %}
+                        <div class="progress mb-1" style="height: 8px;">
+                            <div class="progress-bar bg-danger" role="progressbar"
+                                 style="width: {{ protein_percent }}%;" aria-valuenow="{{ protein_percent }}"
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="text-danger mb-0 small">
+                            <i class="fas fa-exclamation-circle"></i> Only {{ protein_percent }}% of target
+                        </p>
+                    {% else %}
+                        <div class="progress mb-1" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: {{ protein_percent }}%;" aria-valuenow="{{ protein_percent }}"
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p class="text-success mb-0 small">{{ protein_percent }}% of daily target</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h5 mb-0"><i class="fas fa-chart-bar me-2"></i>Nutrition Breakdown</h2>
+                </div>
+                <div class="card-body p-3">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Carbohydrates: {{ today_carbs }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar"
+                                 style="width: {{ (today_carbs/300)*100 if today_carbs else 0 }}%;"
+                                 aria-valuenow="{{ today_carbs }}" aria-valuemin="0" aria-valuemax="300"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Protein: {{ today_protein }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: {{ (today_protein/100)*100 if today_protein else 0 }}%;"
+                                 aria-valuenow="{{ today_protein }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Fiber: {{ today_fiber }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" role="progressbar"
+                                 style="width: {{ (today_fiber/30)*100 if today_fiber else 0 }}%;"
+                                 aria-valuenow="{{ today_fiber }}" aria-valuemin="0" aria-valuemax="30"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Sugar: {{ today_sugar }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar"
+                                 style="width: {{ (today_sugar/50)*100 if today_sugar else 0 }}%;"
+                                 aria-valuenow="{{ today_sugar }}" aria-valuemin="0" aria-valuemax="50"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Sodium: {{ today_sodium }}mg</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-danger" role="progressbar"
+                                 style="width: {{ (today_sodium/2300)*100 if today_sodium else 0 }}%;"
+                                 aria-valuenow="{{ today_sodium }}" aria-valuemin="0" aria-valuemax="2300"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h5 mb-0"><i class="fas fa-chart-line me-2"></i>Calorie Trends</h2>
+                        <div>
+                            <a href="{{ url_for('daily_report') }}" class="btn btn-sm btn-light">Daily</a>
+                            <a href="{{ url_for('weekly_report') }}" class="btn btn-sm btn-light mx-1">Weekly</a>
+                            <a href="{{ url_for('monthly_report') }}" class="btn btn-sm btn-light">Monthly</a>
+                        </div>
+                    </div>
+                    <ul class="nav nav-tabs card-header-tabs" id="chart-period-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="weekly-tab" data-bs-toggle="tab"
+                                    data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly"
+                                    aria-selected="true">Weekly
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly"
+                                    type="button" role="tab" aria-controls="monthly" aria-selected="false">Monthly
+                            </button>
+                        </li>
+                        {#                    <li class="nav-item" role="presentation">#}
+                        {#                        <button class="nav-link" id="yearly-tab" data-bs-toggle="tab" data-bs-target="#yearly" type="button" role="tab" aria-controls="yearly" aria-selected="false">Yearly</button>#}
+                        {#                    </li>#}
+                    </ul>
+                </div>
+                <div class="card-body p-3">
+                    <div class="tab-content" id="chart-period-content">
+                        <div class="tab-pane fade show active" id="weekly" role="tabpanel" aria-labelledby="weekly-tab">
+                            <canvas id="weeklyChart" width="400" height="250"></canvas>
+                        </div>
+                        <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+                            <canvas id="monthlyChart" width="400" height="250"></canvas>
+                        </div>
+                        {#                                            <div class="tab-pane fade" id="yearly" role="tabpanel" aria-labelledby="yearly-tab">#}
+                        {#                                                <canvas id="yearlyChart" width="400" height="250"></canvas>#}
+                        {#                                            </div>#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h5 mb-0"><i class="fas fa-utensils me-2"></i>Recent Food Logs</h2>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_food_logs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Food</th>
+                                    <th>Calories</th>
+                                    <th>Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for log in recent_food_logs %}
+                                    <tr>
+                                        <td>{{ log.name }}</td>
+                                        <td>{{ log.calories }}</td>
+                                        <td>{{ log.date.strftime('%b %d, %Y %I:%M %p') }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center p-4">
+                            <p class="mb-0 text-muted">No food logs yet. Start tracking what you eat!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h5 mb-0"><i class="fas fa-running me-2"></i>Recent Exercise Logs</h2>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_exercise_logs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Exercise</th>
+                                    <th>Duration</th>
+                                    <th>Calories Burned</th>
+                                    <th>Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for log in recent_exercise_logs %}
+                                    <tr>
+                                        <td>{{ log.name }}</td>
+                                        <td>{{ log.duration }} min</td>
+                                        <td>{{ log.calories_burned }}</td>
+                                        <td>{{ log.date.strftime('%b %d, %Y %I:%M %p') }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center p-4">
+                            <p class="mb-0 text-muted">No exercise logs yet. Start tracking your workouts!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Check if we're coming from a form submission
+    const isPageRefresh = performance.navigation.type === performance.navigation.TYPE_RELOAD;
+
+    document.querySelectorAll('.btn-dash').forEach(button => {
+        // If we submitted the form, keep button disabled until manual refresh
+        if (sessionStorage.getItem('formSubmitted')) {
+            button.disabled = true;
+            button.textContent = 'Processing...';
+            sessionStorage.removeItem('formSubmitted');
+        }
+
+        button.addEventListener('click', function() {
+            // Set flag in sessionStorage
+            sessionStorage.setItem('formSubmitted', 'true');
+
+            // Visual feedback
+            this.disabled = true;
+            this.textContent = 'Processing...';
+
+            // Submit the form
+            if (this.form) {
+                this.form.submit();
+            }
+        });
+    });
+});
+
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Configure voice input for both forms
+            setupVoiceInput('foodVoiceBtn', 'foodInput', 'foodVoiceStatus');
+            setupVoiceInput('exerciseVoiceBtn', 'exerciseInput', 'exerciseVoiceStatus');
+
+            function setupVoiceInput(buttonId, inputId, statusId) {
+                const voiceBtn = document.getElementById(buttonId);
+                const voiceStatus = document.getElementById(statusId);
+                const voiceInput = document.getElementById(inputId);
+
+                if (!('webkitSpeechRecognition' in window)) {
+                    voiceStatus.textContent = 'Voice input not supported';
+                    voiceBtn.disabled = true;
+                    return;
+                }
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                voiceBtn.addEventListener('click', () => {
+                    if (voiceBtn.classList.contains('listening')) {
+                        recognition.stop();
+                        voiceBtn.classList.remove('listening');
+                        voiceStatus.textContent = '';
+                    } else {
+                        recognition.start();
+                        voiceBtn.classList.add('listening');
+                        voiceStatus.textContent = 'Listening...';
+                        voiceStatus.classList.remove('text-danger');
+                    }
+                });
+
+                recognition.onresult = function (event) {
+                    const transcript = event.results[0][0].transcript;
+                    voiceInput.value = transcript;
+                    voiceBtn.classList.remove('listening');
+                    voiceStatus.textContent = 'Voice input received';
+                    voiceStatus.classList.add('text-success');
+                    setTimeout(() => voiceStatus.textContent = '', 2000);
+                };
+
+                recognition.onerror = function (event) {
+                    console.error('Speech recognition error:', event.error);
+                    voiceBtn.classList.remove('listening');
+                    voiceStatus.textContent = `Error: ${event.error}`;
+                    voiceStatus.classList.add('text-danger');
+                };
+
+                recognition.onend = function () {
+                    if (voiceBtn.classList.contains('listening')) {
+                        voiceBtn.classList.remove('listening');
+                        voiceStatus.textContent = 'Listening stopped';
+                        voiceStatus.classList.add('text-danger');
+                    }
+                };
+            }
+        });
+    </script>
+    <script src="{{ url_for('static', filename='js/chart_utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script>
+        // Initial chart data
+        const dailyLabels = {{ daily_labels|safe }};
+        const dailyCalories = {{ daily_calories|safe }};
+        const dailyCaloriesBurned = {{ daily_calories_burned|safe }};
+
+        // Initialize the weekly chart with the data passed from Flask
+        document.addEventListener('DOMContentLoaded', function () {
+            initWeeklyChart(dailyLabels, dailyCalories, dailyCaloriesBurned);
+
+            // Load monthly and yearly data when their tabs are clicked
+            document.getElementById('monthly-tab').addEventListener('click', function () {
+                if (!window.monthlyChartInitialized) {
+                    loadChartData('month');
+                    window.monthlyChartInitialized = true;
+                }
+            });
+
+            document.getElementById('yearly-tab').addEventListener('click', function () {
+                if (!window.yearlyChartInitialized) {
+                    loadChartData('year');
+                    window.yearlyChartInitialized = true;
+                }
+            });
+        });
+    </script>
+{% endblock %}

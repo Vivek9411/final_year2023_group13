@@ -1,0 +1,180 @@
+/* 
+ * HealthTracker Custom Styles
+ * Custom CSS for the HealthTracker app
+ */
+
+/* General utility classes */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Cards with hover effect */
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Custom styling for charts container */
+.chart-container {
+  position: relative;
+  min-height: 300px;
+}
+
+/* Loading state for charts */
+.chart-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(33, 37, 41, 0.5);
+  z-index: 10;
+}
+
+/* Custom styling for dashboard stats */
+.stat-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+  border-radius: 0.5rem;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.stat-card .card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Natural language input form */
+.natural-language-input {
+  background-color: #2b3035;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.natural-language-input textarea {
+  background-color: #212529;
+  border: 1px solid #495057;
+  color: #fff;
+}
+
+.natural-language-input textarea:focus {
+  background-color: #2b3035;
+  color: #fff;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Custom styling for meal cards */
+.meal-card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.meal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.meal-item-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Nutrition progress bars */
+.nutrition-progress {
+  height: 10px;
+  border-radius: 5px;
+}
+
+.nutrition-progress-carbs {
+  background-color: #0d6efd;
+}
+
+.nutrition-progress-protein {
+  background-color: #198754;
+}
+
+.nutrition-progress-fiber {
+  background-color: #0dcaf0;
+}
+
+.nutrition-progress-sugar {
+  background-color: #ffc107;
+}
+
+.nutrition-progress-sodium {
+  background-color: #dc3545;
+}
+
+/* Media queries for responsive designs */
+@media (max-width: 768px) {
+  .stat-card .card-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .chart-container {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 576px) {
+  .meal-card {
+    margin-bottom: 1.5rem;
+  }
+  
+  .nutrition-title {
+    font-size: 0.8rem;
+  }
+}
+
+
+
+
+.flash-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .flash-message {
+            transition: all 0.4s ease;
+            transform: translateX(120%);
+            opacity: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .flash-message.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .flash-progress {
+            height: 3px;
+            width: 100%;
+            background: rgba(255,255,255,0.3);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            animation: progress 5s linear forwards;
+        }
+
+        @keyframes progress {
+            from { width: 100% }
+            to { width: 0% }
+        }

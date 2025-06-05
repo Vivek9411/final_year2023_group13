@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}Nutrition & Exercise Comparison - HealthTracker{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fas fa-balance-scale me-2"></i>Your Nutrition & Exercise Comparison</h1>
+    
+    <div class="alert alert-info mb-4">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="fas fa-info-circle fa-2x"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading">Your personalized recommendations</h5>
+                <p class="mb-0">These recommendations are based on your profile information: {{ current_user.weight }}kg, {{ current_user.height }}cm, {{ current_user.age }} years, {{ current_user.gender }}, {{ current_user.activity_level }} activity level, with a goal to <strong>{{ current_user.motive }} weight</strong>.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h5 mb-0"><i class="fas fa-utensils me-2"></i>Nutrition Overview</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-sm-6 text-center mb-3 mb-sm-0">
+                            <div class="card bg-light border-0 text-dark">
+                                <div class="card-body py-4 ">
+                                    <h5 class="mb-1">Recommended</h5>
+                                    <div class="display-5 fw-bold mb-0">{{ recommendations.nutrition.calories }}</div>
+                                    <div class="">calories/day</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 text-center">
+                            <div class="card {% if today_nutrition.calories > recommendations.nutrition.calories and current_user.motive == 'lose' %}bg-danger text-white{% elif today_nutrition.calories < recommendations.nutrition.calories and current_user.motive == 'gain' %}bg-warning{% elif today_nutrition.calories < recommendations.nutrition.calories * 0.8 and current_user.motive == 'maintain' %}bg-warning{% elif today_nutrition.calories > recommendations.nutrition.calories * 1.2 and current_user.motive == 'maintain' %}bg-warning{% else %}bg-success text-white{% endif %} border-0">
+                                <div class="card-body py-4">
+                                    <h5 class="mb-1">Your Today</h5>
+                                    <div class="display-5 fw-bold mb-0">{{ today_nutrition.calories }}</div>
+                                    <div class="{% if today_nutrition.calories > recommendations.nutrition.calories and current_user.motive == 'lose' %}text-white-50{% elif today_nutrition.calories < recommendations.nutrition.calories and current_user.motive == 'gain' %}text-muted{% elif today_nutrition.calories < recommendations.nutrition.calories * 0.8 and current_user.motive == 'maintain' %}text-muted{% elif today_nutrition.calories > recommendations.nutrition.calories * 1.2 and current_user.motive == 'maintain' %}text-muted{% else %}text-white-50{% endif %}">calories consumed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Macronutrients comparison -->
+                    <h5 class="mb-3 mt-4">Macro Nutrients</h5>
+                    
+                    <!-- Protein -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>Protein</div>
+                            <div><span class="fw-bold">{{ today_nutrition.protein }}g</span> of {{ recommendations.nutrition.protein }}g</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ (today_nutrition.protein / recommendations.nutrition.protein * 100) if recommendations.nutrition.protein > 0 else 0 }}%;" 
+                                 aria-valuenow="{{ today_nutrition.protein }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="{{ recommendations.nutrition.protein }}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Carbs -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>Carbohydrates</div>
+                            <div><span class="fw-bold">{{ today_nutrition.carbs }}g</span> of {{ recommendations.nutrition.carbs }}g</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="width: {{ (today_nutrition.carbs / recommendations.nutrition.carbs * 100) if recommendations.nutrition.carbs > 0 else 0 }}%;" 
+                                 aria-valuenow="{{ today_nutrition.carbs }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="{{ recommendations.nutrition.carbs }}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fiber -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>Fiber</div>
+                            <div><span class="fw-bold">{{ today_nutrition.fiber }}g</span> of {{ recommendations.nutrition.fiber }}g</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 style="width: {{ (today_nutrition.fiber / recommendations.nutrition.fiber * 100) if recommendations.nutrition.fiber > 0 else 0 }}%;" 
+                                 aria-valuenow="{{ today_nutrition.fiber }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="{{ recommendations.nutrition.fiber }}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sugar -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>Sugar</div>
+                            <div><span class="fw-bold">{{ today_nutrition.sugar }}g</span> / {{ recommendations.nutrition.sugar }}g max</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning {% if today_nutrition.sugar > recommendations.nutrition.sugar %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ (today_nutrition.sugar / recommendations.nutrition.sugar * 100) if recommendations.nutrition.sugar > 0 else 0 }}%;" 
+                                 aria-valuenow="{{ today_nutrition.sugar }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="{{ recommendations.nutrition.sugar }}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sodium -->
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>Sodium</div>
+                            <div><span class="fw-bold">{{ today_nutrition.sodium }}mg</span> / {{ recommendations.nutrition.sodium }}mg max</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-danger" role="progressbar" 
+                                 style="width: {{ (today_nutrition.sodium / recommendations.nutrition.sodium * 100) if recommendations.nutrition.sodium > 0 else 0 }}%;" 
+                                 aria-valuenow="{{ today_nutrition.sodium }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="{{ recommendations.nutrition.sodium }}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light py-3">
+                    <div class="d-grid">
+                        <a href="{{ url_for('food_items') }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-2"></i>Add Food Items
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-success text-white py-3">
+                    <h2 class="h5 mb-0"><i class="fas fa-running me-2"></i>Exercise Overview</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-sm-6 text-center mb-3 mb-sm-0">
+                            <div class="card bg-light border-0 text-dark">
+                                <div class="card-body py-4">
+                                    <h5 class="mb-1">Today's Activity</h5>
+                                    <div class="display-5 fw-bold mb-0">{{ today_exercise.minutes }}</div>
+                                    <div class="">minutes</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 text-center">
+                            <div class="card bg-light border-0 text-dark">
+                                <div class="card-body py-4">
+                                    <h5 class="mb-1">Calories Burned</h5>
+                                    <div class="display-5 fw-bold mb-0">{{ today_exercise.calories_burned }}</div>
+                                    <div class="">calories</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mb-3 mt-4">Weekly Exercise Goals</h5>
+                    
+                    <!-- Weekly Cardio Minutes -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>Weekly Cardio</div>
+                            <div><span class="fw-bold">{{ weekly_exercise.minutes }}</span> / {{ recommendations.exercise.weekly_cardio_minutes }} minutes</div>
+                        </div>
+                        <div class="progress" style="height: 15px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ (weekly_exercise.minutes / recommendations.exercise.weekly_cardio_minutes * 100) if recommendations.exercise.weekly_cardio_minutes > 0 else 0 }}%;" 
+                                 aria-valuenow="{{ weekly_exercise.minutes }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="{{ recommendations.exercise.weekly_cardio_minutes }}"></div>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            {% if weekly_exercise.minutes >= recommendations.exercise.weekly_cardio_minutes %}
+                                <i class="fas fa-check-circle text-success"></i> You've met your weekly cardio goal!
+                            {% else %}
+                                <i class="fas fa-info-circle"></i> You need {{ recommendations.exercise.weekly_cardio_minutes - weekly_exercise.minutes }} more minutes this week
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Strength Training -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>Strength Training Days</div>
+                            <div><span class="fw-bold">{{ weekly_exercise.strength_days }}</span> / {{ recommendations.exercise.weekly_strength_days }} days</div>
+                        </div>
+                        <div class="progress" style="height: 15px;">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="width: {{ (weekly_exercise.strength_days / recommendations.exercise.weekly_strength_days * 100) if recommendations.exercise.weekly_strength_days > 0 else 0 }}%;" 
+                                 aria-valuenow="{{ weekly_exercise.strength_days }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="{{ recommendations.exercise.weekly_strength_days }}"></div>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            {% if weekly_exercise.strength_days >= recommendations.exercise.weekly_strength_days %}
+                                <i class="fas fa-check-circle text-success"></i> You've met your weekly strength training goal!
+                            {% else %}
+                                <i class="fas fa-info-circle"></i> You need {{ recommendations.exercise.weekly_strength_days - weekly_exercise.strength_days }} more strength training days this week
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Calories Burned -->
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>Weekly Calories Burned</div>
+                            <div><span class="fw-bold">{{ weekly_exercise.calories_burned }}</span> / {{ recommendations.exercise.weekly_calories_burned }} calories</div>
+                        </div>
+                        <div class="progress" style="height: 15px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 style="width: {{ (weekly_exercise.calories_burned / recommendations.exercise.weekly_calories_burned * 100) if recommendations.exercise.weekly_calories_burned > 0 else 0 }}%;" 
+                                 aria-valuenow="{{ weekly_exercise.calories_burned }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="{{ recommendations.exercise.weekly_calories_burned }}"></div>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            {% if weekly_exercise.calories_burned >= recommendations.exercise.weekly_calories_burned %}
+                                <i class="fas fa-check-circle text-success"></i> You've met your weekly calorie burn goal!
+                            {% else %}
+                                <i class="fas fa-info-circle"></i> You need to burn {{ recommendations.exercise.weekly_calories_burned - weekly_exercise.calories_burned }} more calories this week
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light py-3 text-dark">
+                    <div class="d-grid">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-success">
+                            <i class="fas fa-plus-circle me-2"></i>Log Exercise
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary text-white py-3">
+            <h2 class="h5 mb-0"><i class="fas fa-dumbbell me-2"></i>Your Personalized Recommendations</h2>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <h5 class="mb-3">Based on your profile:</h5>
+                    <ul class="list-group mb-4">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Base Metabolic Rate (BMR)</span>
+                            <span class="badge bg-primary rounded-pill">{{ recommendations.bmr }} calories/day</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Total Daily Energy Expenditure</span>
+                            <span class="badge bg-primary rounded-pill">{{ recommendations.tdee }} calories/day</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Daily Calorie Target ({{ current_user.motive }} weight)</span>
+                            <span class="badge bg-success rounded-pill">{{ recommendations.nutrition.calories }} calories/day</span>
+                        </li>
+                    </ul>
+                    
+                    <h5 class="mb-3">Daily Nutrition Targets:</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Protein</span>
+                            <span class="badge bg-success rounded-pill">{{ recommendations.nutrition.protein }}g</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Carbohydrates</span>
+                            <span class="badge bg-primary rounded-pill">{{ recommendations.nutrition.carbs }}g</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Fiber (minimum)</span>
+                            <span class="badge bg-info rounded-pill">{{ recommendations.nutrition.fiber }}g</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Sugar (maximum)</span>
+                            <span class="badge bg-warning rounded-pill">{{ recommendations.nutrition.sugar }}g</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Sodium (maximum)</span>
+                            <span class="badge bg-danger rounded-pill">{{ recommendations.nutrition.sodium }}mg</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5 class="mb-3">Exercise Recommendations:</h5>
+                    <div class="card bg-light border-0 mb-4 text-dark">
+                        <div class="card-body">
+                            <h5 class="card-title">Weekly Exercise Goals</h5>
+                            <p class="card-text">Based on your profile and goals to {{ current_user.motive }} weight:</p>
+                            <ul class="list-group list-group-flush mb-3">
+                                <li class="list-group-item bg-transparent text-dark">
+                                    <i class="fas fa-running text-success me-2"></i>
+                                    <strong>{{ recommendations.exercise.weekly_cardio_minutes }} minutes</strong> of cardio exercise weekly
+                                </li>
+                                <li class="list-group-item bg-transparent text-dark">
+                                    <i class="fas fa-dumbbell text-warning me-2"></i>
+                                    <strong>{{ recommendations.exercise.weekly_strength_days }} days</strong> of strength training weekly
+                                </li>
+                                <li class="list-group-item bg-transparent text-dark">
+                                    <i class="fas fa-fire-alt text-danger me-2"></i>
+                                    <strong>{{ recommendations.exercise.weekly_calories_burned }} calories</strong> burned through exercise weekly
+                                </li>
+                            </ul>
+                            <h6 class="card-subtitle mb-2 ">Daily Goals:</h6>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item bg-transparent text-dark">
+                                    <i class="fas fa-running text-success me-2"></i>
+                                    <strong>{{ recommendations.exercise.daily_cardio_minutes }} minutes</strong> of daily activity
+                                </li>
+                                <li class="list-group-item bg-transparent text-dark">
+                                    <i class="fas fa-fire-alt text-danger me-2"></i>
+                                    <strong>{{ recommendations.exercise.daily_calories_burned }} calories</strong> burned daily
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Tips for {{ current_user.motive }} weight:</h5>
+                        {% if current_user.motive == 'lose' %}
+                        <ul class="mb-0">
+                            <li>Focus on maintaining a calorie deficit</li>
+                            <li>Prioritize protein to preserve muscle mass</li>
+                            <li>Include both cardio and strength training</li>
+                            <li>Stay hydrated and get adequate sleep</li>
+                        </ul>
+                        {% elif current_user.motive == 'gain' %}
+                        <ul class="mb-0">
+                            <li>Consistently consume a calorie surplus</li>
+                            <li>Prioritize protein intake for muscle growth</li>
+                            <li>Focus on strength training with progressive overload</li>
+                            <li>Don't neglect cardio for heart health</li>
+                        </ul>
+                        {% else %}
+                        <ul class="mb-0">
+                            <li>Focus on nutrient-dense whole foods</li>
+                            <li>Balance your macronutrients based on your activity level</li>
+                            <li>Include both cardio and strength training</li>
+                            <li>Maintain consistent eating and exercise patterns</li>
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mb-5">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-tachometer-alt me-2"></i>Return to Dashboard
+        </a>
+        <a href="{{ url_for('profile') }}" class="btn btn-outline-primary btn-lg ms-2">
+            <i class="fas fa-user-edit me-2"></i>Update Your Profile
+        </a>
+    </div>
+</div>
+{% endblock %}

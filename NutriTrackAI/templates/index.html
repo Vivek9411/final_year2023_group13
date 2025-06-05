@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}HealthTracker - Your Personal Health Companion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row align-items-center py-5">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <h1 class="display-4 fw-bold mb-4">Track Your Health Journey with AI</h1>
+            <p class="lead mb-4">
+                HealthTracker uses natural language processing to make tracking your food and exercise simple. Just type what you ate or how you exercised, and we'll do the rest!
+            </p>
+            <div class="d-grid gap-2 d-md-flex">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4 me-md-2">Go to Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Get Started</a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg px-4">Log In</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="300" fill="currentColor" class="bi bi-activity" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2Z"/>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="row py-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="display-5 fw-bold">Features</h2>
+            <p class="lead">Everything you need to track your health journey in one place</p>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-brain text-primary fa-3x mb-3"></i>
+                    <h3 class="card-title h4">Natural Language Processing</h3>
+                    <p class="card-text">Simply type what you ate or how you exercised, and our AI will understand and track it automatically.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-chart-line text-primary fa-3x mb-3"></i>
+                    <h3 class="card-title h4">Data Visualization</h3>
+                    <p class="card-text">See your progress with beautiful charts and graphs. Track daily, weekly, and monthly patterns.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-utensils text-primary fa-3x mb-3"></i>
+                    <h3 class="card-title h4">Custom Meals</h3>
+                    <p class="card-text">Create and save your favorite meals for easy logging. Automatically calculate nutrition info.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row py-5 align-items-center">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <h2 class="display-5 fw-bold mb-4">How It Works</h2>
+            <div class="d-flex mb-4">
+                <div class="me-3">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <span class="text-white fw-bold">1</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="h5 fw-bold">Enter What You Ate or Did</h3>
+                    <p>Type natural phrases like "I ate two apples" or "I ran for 30 minutes"</p>
+                </div>
+            </div>
+            <div class="d-flex mb-4">
+                <div class="me-3">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <span class="text-white fw-bold">2</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="h5 fw-bold">AI Processes Your Entry</h3>
+                    <p>Our AI understands what you mean and calculates nutrition or calories burned</p>
+                </div>
+            </div>
+            <div class="d-flex">
+                <div class="me-3">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <span class="text-white fw-bold">3</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="h5 fw-bold">Track Your Progress</h3>
+                    <p>See your nutrition and exercise data visualized in helpful charts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="h5 mb-3">Try Our Natural Language Input:</h3>
+                    <div class="card bg-dark-subtle mb-3">
+                        <div class="card-body">
+                            <p class="mb-0"><strong>You type:</strong> "I ate two apples and a banana for breakfast"</p>
+                        </div>
+                    </div>
+                    <div class="card bg-success-subtle mb-3">
+                        <div class="card-body">
+                            <p class="mb-0 text-dark"><strong>HealthTracker understands:</strong> 2 apples (190 calories, 1g protein) and 1 banana (105 calories, 1.3g protein)</p>
+                        </div>
+                    </div>
+                    <div class="card bg-dark-subtle mb-3">
+                        <div class="card-body">
+                            <p class="mb-0"><strong>You type:</strong> "I jogged for 45 minutes this morning"</p>
+                        </div>
+                    </div>
+                    <div class="card bg-success-subtle">
+                        <div class="card-body">
+                            <p class="mb-0 text-dark"><strong>HealthTracker understands:</strong> Jogging for 45 minutes (approximately 360 calories burned)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row py-5 text-center">
+        <div class="col-12 mb-4">
+            <h2 class="display-5 fw-bold">Start Your Health Journey Today</h2>
+            <p class="lead mb-5">Join thousands of users who are tracking their health the smart way</p>
+        </div>
+        <div class="col-12">
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4 gap-3">Go to Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 gap-3">Sign Up Now</a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg px-4">Log In</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

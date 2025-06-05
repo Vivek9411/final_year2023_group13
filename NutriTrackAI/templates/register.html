@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Register - HealthTracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Enhanced Header -->
+            <div class="card-header bg-gradient-primary text-white py-4 rounded-top-4">
+                <div class="d-flex flex-column align-items-center">
+{#                    <i class="fas fa-user-plus fa-2x mb-3"></i>#}
+                    <h2 class="mb-0 text-center fw-bold display-6">Create Your Account</h2>
+                    <p class="text-center mt-2 mb-0 opacity-75">Start your health journey with us</p>
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <!-- Original form tag and hidden fields preserved -->
+                <form method="POST" action="{{ url_for('register') }}">
+                    {{ form.hidden_tag() }}
+
+                    <!-- Username Field (styled) -->
+                    <div class="mb-4">
+                        {{ form.username.label(class="form-label fw-semibold") }}
+                        {% if form.username.errors %}
+                            {{ form.username(class="form-control is-invalid rounded-3 py-2") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.username(class="form-control rounded-3 py-2", placeholder="Choose a username") }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Email Field (styled) -->
+                    <div class="mb-4">
+                        {{ form.email.label(class="form-label fw-semibold") }}
+                        {% if form.email.errors %}
+                            {{ form.email(class="form-control is-invalid rounded-3 py-2") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.email(class="form-control rounded-3 py-2", placeholder="Enter your email") }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Fields (styled) -->
+                    <div class="mb-4">
+                        {{ form.password.label(class="form-label fw-semibold") }}
+                        {% if form.password.errors %}
+                            {{ form.password(class="form-control is-invalid rounded-3 py-2") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password(class="form-control rounded-3 py-2", placeholder="Create a password") }}
+                        {% endif %}
+                        <div class="form-text mt-1">Password must be at least 6 characters long.</div>
+                    </div>
+
+                    <div class="mb-5">
+                        {{ form.confirm_password.label(class="form-label fw-semibold") }}
+                        {% if form.confirm_password.errors %}
+                            {{ form.confirm_password(class="form-control is-invalid rounded-3 py-2") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.confirm_password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.confirm_password(class="form-control rounded-3 py-2", placeholder="Confirm your password") }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Profile Section (styled) -->
+                    <h4 class="mb-3 mt-4 fw-bold text-primary">Your Profile Information</h4>
+                    <p class="text-muted mb-4">We need this information to provide personalized recommendations.</p>
+
+                    <!-- Original profile fields with styling only -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            {{ form.weight.label(class="form-label fw-semibold") }}
+                            {% if form.weight.errors %}
+                                {{ form.weight(class="form-control is-invalid rounded-3 py-2", placeholder="e.g., 70") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.weight.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.weight(class="form-control rounded-3 py-2", placeholder="e.g., 70") }}
+                            {% endif %}
+                            <div class="form-text mt-1">in kilograms (kg)</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.height.label(class="form-label fw-semibold") }}
+                            {% if form.height.errors %}
+                                {{ form.height(class="form-control is-invalid rounded-3 py-2", placeholder="e.g., 175") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.height.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.height(class="form-control rounded-3 py-2", placeholder="e.g., 175") }}
+                            {% endif %}
+                            <div class="form-text mt-1">in centimeters (cm)</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.age.label(class="form-label fw-semibold") }}
+                            {% if form.age.errors %}
+                                {{ form.age(class="form-control is-invalid rounded-3 py-2", placeholder="e.g., 30") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.age.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.age(class="form-control rounded-3 py-2", placeholder="e.g., 30") }}
+                            {% endif %}
+                            <div class="form-text mt-1">in years</div>
+                        </div>
+                    </div>
+
+                    <!-- Original select fields with styling only -->
+                    <div class="row g-3 mb-5">
+                        <div class="col-md-4">
+                            {{ form.gender.label(class="form-label fw-semibold") }}
+                            {% if form.gender.errors %}
+                                {{ form.gender(class="form-select is-invalid rounded-3 py-2") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.gender.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.gender(class="form-select rounded-3 py-2") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.activity_level.label(class="form-label fw-semibold") }}
+                            {% if form.activity_level.errors %}
+                                {{ form.activity_level(class="form-select is-invalid rounded-3 py-2") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.activity_level.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.activity_level(class="form-select rounded-3 py-2") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.motive.label(class="form-label fw-semibold") }}
+                            {% if form.motive.errors %}
+                                {{ form.motive(class="form-select is-invalid rounded-3 py-2") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.motive.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.motive(class="form-select rounded-3 py-2") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Submit Button (styled) -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold rounded-3">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Enhanced Footer -->
+            <div class="card-footer bg-transparent border-0 text-center py-4 rounded-bottom-4">
+                <p class="mb-3 text-muted">Already have an account?</p>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-semibold">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login Here
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

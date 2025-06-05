@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Meals - HealthTracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent py-3">
+                <h3 class="h5 mb-0"><i class="fas fa-utensils me-2"></i>Create New Meal</h3>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('add_meal') }}">
+                    {{ meal_form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ meal_form.name.label(class="form-label") }}
+                        {% if meal_form.name.errors %}
+                            {{ meal_form.name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in meal_form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ meal_form.name(class="form-control", placeholder="e.g., Breakfast Bowl") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ meal_form.description.label(class="form-label") }}
+                        {% if meal_form.description.errors %}
+                            {{ meal_form.description(class="form-control is-invalid", rows=3) }}
+                            <div class="invalid-feedback">
+                                {% for error in meal_form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ meal_form.description(class="form-control", rows=3, placeholder="Optional description") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        {{ meal_form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <h1 class="mb-4"><i class="fas fa-utensils me-2"></i>Your Meals</h1>
+        
+        {% if meals %}
+            <div class="row">
+                {% for meal in meals %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-primary text-white py-3">
+                                <h3 class="h5 mb-0 d-flex justify-content-between align-items-center">
+                                    {{ meal.name }}
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-primary" type="button" id="mealMenuButton{{ meal.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mealMenuButton{{ meal.id }}">
+                                            <li>
+                                                <form action="{{ url_for('add_meal_to_log', meal_id=meal.id) }}" method="POST">
+                                                    <button class="dropdown-item" type="submit">
+                                                        <i class="fas fa-plus-circle me-2"></i>Add to Food Log
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li><a class="dropdown-item" href="{{ url_for('edit_meal', meal_id=meal.id) }}"><i class="fas fa-edit me-2"></i>Edit Meal</a></li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteMealModal{{ meal.id }}">
+                                                    <i class="fas fa-trash me-2"></i>Delete Meal
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </h3>
+                            </div>
+                            <div class="card-body p-3">
+                                {% if meal.description %}
+                                    <p class="text-muted mb-3">{{ meal.description }}</p>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div><strong>Total Calories:</strong></div>
+                                    <div>{{ meal.total_calories }}</div>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div><strong>Protein:</strong></div>
+                                    <div>{{ meal.total_protein }}g</div>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div><strong>Carbs:</strong></div>
+                                    <div>{{ meal.total_carbs }}g</div>
+                                </div>
+                                
+                                <hr class="my-3">
+                                
+                                <h4 class="h6 mb-3">Ingredients:</h4>
+                                {% if meal.meal_items %}
+                                    <ul class="list-group list-group-flush">
+                                        {% for item in meal.meal_items %}
+                                            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                                                <div>
+                                                    <span>{{ item.custom_item.name }}</span>
+                                                    <small class="text-muted d-block">{{ item.quantity }} {{ item.custom_item.unit }}</small>
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-3">{{ item.calories_total }} cal</span>
+                                                    <form action="{{ url_for('delete_meal_item', meal_item_id=item.id) }}" method="POST">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">No items added to this meal yet.</p>
+                                {% endif %}
+                                
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#addIngredientCollapse{{ meal.id }}" aria-expanded="false" aria-controls="addIngredientCollapse{{ meal.id }}">
+                                        <i class="fas fa-plus me-1"></i> Add Ingredient
+                                    </button>
+                                </div>
+                                
+                                <div class="collapse mt-3" id="addIngredientCollapse{{ meal.id }}">
+                                    <div class="card card-body bg-light">
+                                        <h5 class="h6 mb-3 text-dark ">Add Item to Meal</h5>
+                                        <form method="POST" action="{{ url_for('add_meal_item', meal_id=meal.id) }}">
+                                            {{ meal_item_form.hidden_tag() }}
+                                            
+                                            <div class="mb-3">
+                                                {{ meal_item_form.custom_item_id.label(class="form-label text-dark") }}
+                                                <div class="input-group">
+                                                    <input type="text" id="food-search-{{ meal.id }}" class="form-control" placeholder="Search food items..." autocomplete="off">
+                                                    <div id="search-results-{{ meal.id }}" class="dropdown-menu w-100"></div>
+                                                </div>
+                                                {% if meal_item_form.custom_item_id.errors %}
+                                                    {{ meal_item_form.custom_item_id(class="form-select is-invalid d-none ") }}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in meal_item_form.custom_item_id.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% else %}
+                                                    {{ meal_item_form.custom_item_id(class="form-select d-none") }}
+                                                {% endif %}
+                                                <div id="selected-food-{{ meal.id }}" class="mt-2 d-none">
+                                                    <div class="card">
+                                                        <div class="card-body p-2">
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span id="selected-food-name-{{ meal.id }}"></span>
+                                                                <span id="selected-food-calories-{{ meal.id }}" class="badge bg-primary"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                {{ meal_item_form.quantity.label(class="form-label text-dark") }}
+                                                {% if meal_item_form.quantity.errors %}
+                                                    {{ meal_item_form.quantity(class="form-control is-invalid") }}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in meal_item_form.quantity.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% else %}
+                                                    {{ meal_item_form.quantity(class="form-control", placeholder="e.g., 1") }}
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="d-grid">
+                                                {{ meal_item_form.submit(class="btn btn-primary") }}
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Delete Meal Modal -->
+                        <div class="modal fade" id="deleteMealModal{{ meal.id }}" tabindex="-1" aria-labelledby="deleteMealModalLabel{{ meal.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteMealModalLabel{{ meal.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete <strong>{{ meal.name }}</strong>? This action cannot be undone.
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{{ url_for('delete_meal', meal_id=meal.id) }}" method="POST">
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> You don't have any meals yet. Create your first meal using the form on the left!
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .dropdown-menu.show {
+        max-height: 200px;
+        overflow-y: auto;
+        width: 100%;
+    }
+    
+    .dropdown-item {
+        white-space: normal;
+        word-wrap: break-word;
+        padding: 0.5rem 1rem;
+    }
+    
+    .selected-food-container {
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/meals.js') }}"></script>
+{% endblock %}

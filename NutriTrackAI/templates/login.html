@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Login - HealthTracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Header with matching rounded corners -->
+            <div class="card-header bg-gradient-primary text-white py-4 rounded-top-4">
+                <div class="d-flex flex-column align-items-center">
+                    <h2 class="mb-0 text-center fw-bold display-6">Welcome Back!</h2>
+                    <p class="text-center mt-2 mb-0 opacity-75">Sign in to continue your health journey</p>
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" action="{{ url_for('login') }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-4">
+                        {{ form.email.label(class="form-label fw-semibold") }}
+                        {% if form.email.errors %}
+                            {{ form.email(class="form-control is-invalid rounded-3") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.email(class="form-control py-3 rounded-3", placeholder="Enter your email") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.password.label(class="form-label fw-semibold") }}
+                        {% if form.password.errors %}
+                            {{ form.password(class="form-control is-invalid rounded-3") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password(class="form-control py-3 rounded-3", placeholder="Enter your password") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold rounded-3">
+                            <i class="fas fa-arrow-right-to-bracket me-2"></i>Login
+                        </button>
+                    </div>
+
+                    <div class="text-center mb-3">
+                        <a href="#" class="text-decoration-none text-primary fw-medium">Forgot password?</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer with matching rounded corners -->
+            <div class="card-footer bg-transparent border-0 text-center py-4 rounded-bottom-4">
+                <p class="mb-3 text-muted">New to HealthTracker?</p>
+                <a href="{{ url_for('register') }}" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-semibold">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

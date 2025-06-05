@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Food Items - HealthTracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-apple-alt me-2"></i>Food Items</h1>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent py-3">
+                <h3 class="h5 mb-0">{% if edit_item %}Edit Food Item{% else %}Add New Food Item{% endif %}</h3>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{% if edit_item %}{{ url_for('edit_food_item', item_id=edit_item.id) }}{% else %}{{ url_for('add_food_item') }}{% endif %}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {% if form.name.errors %}
+                                {{ form.name(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.name(class="form-control", placeholder="Name of food item") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            {{ form.unit.label(class="form-label") }}
+                            {% if form.unit.errors %}
+                                {{ form.unit(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.unit.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.unit(class="form-control", placeholder="e.g., cup, piece") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            {{ form.quantity.label(class="form-label") }}
+                            {% if form.quantity.errors %}
+                                {{ form.quantity(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.quantity.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.quantity(class="form-control", placeholder="e.g., 1") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.calories.label(class="form-label") }}
+                            {% if form.calories.errors %}
+                                {{ form.calories(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.calories.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.calories(class="form-control", placeholder="e.g., 240") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.protein.label(class="form-label") }}
+                            {% if form.protein.errors %}
+                                {{ form.protein(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.protein.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.protein(class="form-control", placeholder="e.g., 6") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.carbohydrates.label(class="form-label") }}
+                            {% if form.carbohydrates.errors %}
+                                {{ form.carbohydrates(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.carbohydrates.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.carbohydrates(class="form-control", placeholder="e.g., 45") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.fiber.label(class="form-label") }}
+                            {% if form.fiber.errors %}
+                                {{ form.fiber(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.fiber.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.fiber(class="form-control", placeholder="e.g., 5") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.sugar.label(class="form-label") }}
+                            {% if form.sugar.errors %}
+                                {{ form.sugar(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.sugar.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.sugar(class="form-control", placeholder="e.g., 12") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.sodium.label(class="form-label") }}
+                            {% if form.sodium.errors %}
+                                {{ form.sodium(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.sodium.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.sodium(class="form-control", placeholder="e.g., 180") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {% if form.description.errors %}
+                            {{ form.description(class="form-control is-invalid", rows=3) }}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.description(class="form-control", rows=3, placeholder="Optional description") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        {% if edit_item %}
+                            <a href="{{ url_for('food_items') }}" class="btn btn-secondary">Cancel</a>
+                            {{ form.submit(class="btn btn-primary", value="Update Food Item") }}
+                        {% else %}
+                            {{ form.submit(class="btn btn-primary") }}
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent py-3">
+                <h3 class="h5 mb-0">Your Food Items</h3>
+            </div>
+            <div class="card-body p-0">
+                {% if items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="foodItemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Unit</th>
+                                    <th>Quantity</th>
+                                    <th>Calories</th>
+                                    <th>Protein</th>
+                                    <th>Carbs</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                    <tr>
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ item.unit }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>{{ item.calories }}</td>
+                                        <td>{{ item.protein }}g</td>
+                                        <td>{{ item.carbohydrates }}g</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('edit_food_item', item_id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ item.id }}">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- Delete Confirmation Modal -->
+                                            <div class="modal fade" id="deleteModal{{ item.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ item.id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="deleteModalLabel{{ item.id }}">Confirm Deletion</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Are you sure you want to delete <strong>{{ item.name }}</strong>? This action cannot be undone.
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <form action="{{ url_for('delete_food_item', item_id=item.id) }}" method="POST">
+                                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center p-4">
+                        <p class="mb-0 text-muted">You don't have any custom food items yet. Add your first one above!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/food_items.js') }}"></script>
+{% endblock %}

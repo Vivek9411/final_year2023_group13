@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice to Text</title>
+    <style>
+        #result { min-height: 100px; border: 1px solid #ccc; padding: 10px; }
+        .listening { background-color: red; color: white; }
+    </style>
+</head>
+<body>
+    <button id="startBtn">Start Listening</button>
+    <div id="result"></div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const resultDiv = document.getElementById('result');
+        
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            
+            startBtn.addEventListener('click', () => {
+                if (startBtn.textContent === 'Start Listening') {
+                    recognition.start();
+                    startBtn.textContent = 'Stop Listening';
+                    startBtn.classList.add('listening');
+                } else {
+                    recognition.stop();
+                    startBtn.textContent = 'Start Listening';
+                    startBtn.classList.remove('listening');
+                }
+            });
+            
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                resultDiv.innerHTML = transcript;
+            };
+        } else {
+            resultDiv.textContent = 'Speech recognition not supported in this browser';
+            startBtn.disabled = true;
+        }
+    </script>
+</body>
+</html>
