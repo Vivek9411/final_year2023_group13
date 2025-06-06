@@ -300,7 +300,7 @@ class NLPProcessor:
                 }
             },
             "food": {
-                "url": "http://192.168.0.131:5001/process_text",
+                "url": "http://192.168.10.171:5001/process_text",
                 "headers": {
                     "x-app-id": "3db00a91",
                     "x-app-key": "8dc67612535c89a55858b8ab37364320"
